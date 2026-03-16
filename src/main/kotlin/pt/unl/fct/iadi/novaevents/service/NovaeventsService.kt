@@ -2,6 +2,7 @@ package pt.unl.fct.iadi.novaevents.service
 
 import org.springframework.stereotype.Service
 import pt.unl.fct.iadi.novaevents.model.Club
+import pt.unl.fct.iadi.novaevents.model.Event
 
 @Service
 class NovaeventsService {
@@ -40,8 +41,17 @@ class NovaeventsService {
     )
 
     val clubMap = clubs.associateBy { it.id }
+    private val events: MutableList<Event> = mutableListOf()
 
     fun listAllClubs(): List<Club> {
         return clubs
+    }
+
+    fun getClubById(id: Long): Club {
+        return clubMap[id] ?: throw ClubNotFoundException(id)
+    }
+
+    fun getEventsForClub(clubId: Long): List<Event> {
+        return events.filter { it.clubId == clubId }
     }
 }
