@@ -72,6 +72,15 @@ class NovaeventsService {
                 Event(
                     nextEventId++,
                     1,
+                    "Spring Chess Tournament",
+                    LocalDate.now().plusDays(13),
+                    "Main Hall",
+                    Event.EventType.COMPETITION,
+                    "University open spring chess tournament"
+                ),
+                Event(
+                    nextEventId++,
+                    1,
                     "Chess Tournament",
                     LocalDate.now().plusDays(5),
                     "Room A",
