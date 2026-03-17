@@ -111,12 +111,16 @@
         <tr th:each="event : ${events}">
 
             <td>
-                <a th:href="@{/events/{id}(id=${event.id})}"
+                <a th:href="@{clubs/{clubId}/events/{id}(id=${event.id}, clubId=${event.clubId})}"
                    th:text="${event.name}">
                 </a>
             </td>
 
-            <td th:text="${clubMap[event.clubId].name}"></td>
+            <td>
+                <a th:href="@{clubs/{clubId}(clubId=${event.clubId})}"
+                   th:text="${clubMap[event.clubId].name}">
+                </a>
+            </td>
 
             <td th:text="${event.date}"></td>
 
