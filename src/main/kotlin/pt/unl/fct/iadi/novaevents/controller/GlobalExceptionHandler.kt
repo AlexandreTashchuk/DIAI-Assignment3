@@ -27,6 +27,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EventNotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleEventNotFound(ex: EventNotFoundException, model: Model): String {
         model.addAttribute("message", ex.message)
         return "error/404"
