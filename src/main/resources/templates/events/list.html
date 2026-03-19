@@ -134,12 +134,12 @@
 
             <td>
 
-                <a th:href="@{/events/{id}/edit(id=${event.id})}"
+                <a th:href="@{/clubs/{clubId}/events/{id}/edit(id=${event.id},clubId=${event.clubId})}"
                    class="btn btn-sm btn-outline-primary">
                     Edit
                 </a>
 
-                <a th:href="@{/events/{id}/delete(id=${event.id})}"
+                <a th:href="@{/clubs/{clubId}/events/{id}/delete(id=${event.id},clubId=${event.clubId})}"
                    class="btn btn-sm btn-outline-danger">
                     Delete
                 </a>

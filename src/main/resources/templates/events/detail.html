@@ -38,12 +38,12 @@
     <!-- ACTIONS -->
     <div class="mt-3">
 
-        <a th:href="@{/events/{id}/edit(id=${event.id})}"
+        <a th:href="@{/clubs/{clubId}/events/{id}/edit(id=${event.id},clubId=${event.clubId})}"
            class="btn btn-primary">
             Edit
         </a>
 
-        <a th:href="@{/events/{id}/delete(id=${event.id})}"
+        <a th:href="@{/clubs/{clubId}/events/{id}/delete(id=${event.id},clubId=${event.clubId})}"
            class="btn btn-danger">
             Delete
         </a>

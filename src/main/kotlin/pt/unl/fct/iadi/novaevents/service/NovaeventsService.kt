@@ -49,6 +49,7 @@ class NovaeventsService {
 
     private val clubMap = clubs.associateBy { it.id }
     private val events: MutableList<Event> = mutableListOf()
+    private val eventsMap = events.associateBy { it.id }
 
     private var nextEventId: Long = 1
 
@@ -185,5 +186,11 @@ class NovaeventsService {
 
         events.add(event)
         return event
+    }
+
+    fun updateEventById(eventId: Long, clubId: Long, form: EventForm): Event {
+        clubs.find { it.id == clubId }
+            ?: throw ClubNotFoundException(clubId)
+        // TODO:
     }
 }

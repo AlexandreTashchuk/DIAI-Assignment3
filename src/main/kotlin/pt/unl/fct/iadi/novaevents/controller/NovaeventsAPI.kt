@@ -63,4 +63,26 @@ interface NovaeventsAPI {
         bindingResult: BindingResult,
         model: Model
     ): String //US5
+
+    @RequestMapping(
+        value = ["/clubs/{clubId}/events/{eventId}/edit"],
+        method = [RequestMethod.GET]
+    )
+    fun showEditEventForm(
+        @PathVariable clubId: Long,
+        @PathVariable eventId: Long,
+        model: Model
+    ): String //US6
+
+    @RequestMapping(
+        value = ["/clubs/{clubId}/events/{eventId}"],
+        method = [RequestMethod.POST]
+    )
+    fun updateEvent(
+        @PathVariable clubId: Long,
+        @PathVariable eventId: Long,
+        @Valid @ModelAttribute eventForm: EventForm,
+        bindingResult: BindingResult,
+        model: Model
+    ): String //US6
 }

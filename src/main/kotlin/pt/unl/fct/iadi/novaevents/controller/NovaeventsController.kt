@@ -111,4 +111,44 @@ class NovaeventsController (val service: NovaeventsService) : NovaeventsAPI {
             "events/create"
         }
     }
+
+    override fun showEditEventForm(
+        clubId: Long,
+        eventId: Long,
+        model: Model
+    ): String {
+        val event = service.getEventById(clubId, eventId)
+
+        val form = EventForm(
+            name = event.name,
+            date = event.date,
+            type = event.type,
+            location = event.location,
+            description = event.description
+        )
+
+        model.addAttribute("eventForm", form)
+        model.addAttribute("clubId", clubId)
+        model.addAttribute("eventId", eventId)
+
+        return "events/edit"
+    }
+
+    override fun updateEvent(
+        clubId: Long,
+        eventId: Long,
+        eventForm: EventForm,
+        bindingResult: BindingResult,
+        model: Model
+    ): String {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("clubId", clubId)
+            model.addAttribute("eventId", eventId)
+            return "events/edit"
+        }
+
+        service.updateEventById(clubId, eventId, eventForm)
+
+        return "redirect:/clubs/$clubId/events/$eventId"
+    }
 }

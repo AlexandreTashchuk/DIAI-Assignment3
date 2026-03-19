@@ -1,0 +1,36 @@
+<form th:action="@{/clubs/{clubId}/events/{eventId}(clubId=${clubId}, eventId=${eventId})}"
+      th:object="${eventForm}"
+      method="post">
+
+    <div class="mb-3">
+        <label>Name</label>
+        <input type="text" th:field="*{name}" class="form-control"/>
+    </div>
+
+    <div class="mb-3">
+        <label>Date</label>
+        <input type="date" th:field="*{date}" class="form-control"/>
+    </div>
+
+    <div class="mb-3">
+        <label>Type</label>
+        <select th:field="*{type}" class="form-control">
+            <option th:each="t : ${T(pt.unl.fct.iadi.novaevents.model.Event.EventType).values()}"
+                    th:value="${t}"
+                    th:text="${t}">
+            </option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Location</label>
+        <input type="text" th:field="*{location}" class="form-control"/>
+    </div>
+
+    <div class="mb-3">
+        <label>Description</label>
+        <textarea th:field="*{description}" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Event</button>
+</form>
