@@ -188,9 +188,9 @@ class NovaeventsService {
         clubMap[clubId] ?: throw ClubNotFoundException(clubId)
         val currentEvent =
             events.find { it.id == eventId } ?: throw EventNotFoundException("Event with id:$eventId not found")
-        if (currentEvent.clubId != clubId) {
-            throw ClubDoesNotHaveEventException("Club $clubId does not have event with id:$eventId")
-        }
+//        if (currentEvent.clubId != clubId) {
+//            throw ClubDoesNotHaveEventException("Club $clubId does not have event with id:$eventId")
+//        }
         if (events.any {
                 it.id != eventId &&
                 it.name.equals(form.name, ignoreCase = true)
