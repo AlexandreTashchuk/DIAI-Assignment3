@@ -6,15 +6,28 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event
 import pt.unl.fct.iadi.novaevents.controller.dto.EventForm
 import pt.unl.fct.iadi.novaevents.model.Event
+import pt.unl.fct.iadi.novaevents.repository.EventRepository
 import pt.unl.fct.iadi.novaevents.service.EventAlreadyExistsException
 import pt.unl.fct.iadi.novaevents.service.NovaeventsService
 import java.time.LocalDate
 
 @Controller
-class NovaeventsController (val service: NovaeventsService) : NovaeventsAPI {
+class NovaeventsController(val service: NovaeventsService, val eventRepository: EventRepository) : NovaeventsAPI {
 
+    //    override fun listAllClubs(model: Model): String {
+//        model.addAttribute("clubs", service.listAllClubs())
+//        return "clubs/list"
+//    }
     override fun listAllClubs(model: Model): String {
-        model.addAttribute("clubs", service.listAllClubs())
+        val clubs = service.listAllClubs()
+
+        // Fetch event counts for all clubs in one query
+        val counts = eventRepository.countEventsByClub() // returns List<ClubEventCount>
+        val countMap = counts.associate { it.clubId to it.eventCount }
+
+        model.addAttribute("clubs", clubs)
+        model.addAttribute("eventCounts", countMap)
+
         return "clubs/list"
     }
 

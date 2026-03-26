@@ -35,6 +35,8 @@
                 </details>
             </td>
 
+            <td th:text="${eventCounts[club.id] ?: 0}"></td>
+
             <td>
                 <a class="btn btn-outline-primary btn-sm"
                    th:href="@{/clubs/{id}(id=${club.id})}">
