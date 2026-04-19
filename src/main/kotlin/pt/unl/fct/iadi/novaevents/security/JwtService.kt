@@ -15,13 +15,14 @@ import javax.crypto.SecretKey
 
 @Service
 class JwtService(
-    @Value("\${app.jwt.secret}") private val jwtSecret: String,
-    @Value("\${app.jwt.expiration-seconds:28800}") private val expirationSeconds: Long
+    @Value("\${jwt.secret}") secret: String
 ) {
+    private val key: SecretKey = Keys.hmacShaKeyFor(secret.toByteArray())
+    private val expirationMs = 3_600_000L // 1 hour
 
     fun generateToken(authentication: Authentication): String {
         val now = Instant.now()
-        val expiry = now.plus(Duration.ofSeconds(expirationSeconds))
+        val expiry = now.plus(Duration.ofSeconds(expirationMs))
 
         val roles = authentication.authorities.map(GrantedAuthority::getAuthority)
 
@@ -30,18 +31,15 @@ class JwtService(
             .claim("roles", roles)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiry))
-            .signWith(signingKey())
+            .signWith(key)
             .compact()
     }
 
     fun parseClaims(token: String): Claims =
         Jwts.parser()
-            .verifyWith(signingKey())
+            .verifyWith(key)
             .build()
             .parseSignedClaims(token)
             .payload
-
-    private fun signingKey(): SecretKey =
-        Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret))
 }
 
