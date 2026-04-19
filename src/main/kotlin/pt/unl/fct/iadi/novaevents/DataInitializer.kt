@@ -30,6 +30,10 @@ class DataInitializer(
 
         val alice = appUserRepository.findByUsername("alice")
             ?: throw IllegalStateException("Seed user alice is missing")
+        val bob = appUserRepository.findByUsername("bob")
+            ?: throw IllegalStateException("Seed user bob is missing")
+        val charlie = appUserRepository.findByUsername("charlie")
+            ?: throw IllegalStateException("Seed user charlie is missing")
 
         // One-time repair for databases created before owner FK migration.
         eventRepository.backfillMissingOwners(alice.id)
@@ -37,11 +41,31 @@ class DataInitializer(
         val clubs = if (clubRepository.count() == 0L) {
             clubRepository.saveAll(
                 listOf(
-                    Club(name = "Chess Club", description = "A community for players ...", category = Club.ClubCategory.SPORTS),
-                    Club(name = "Robotics Club", description = "The Robotics Club is the place ...", category = Club.ClubCategory.TECHNOLOGY),
-                    Club(name = "Photography Club", description = "A space for photography enthusiasts ...", category = Club.ClubCategory.SOCIAL),
-                    Club(name = "Hiking & Outdoors Club", description = "Focused on outdoor activities ...", category = Club.ClubCategory.SOCIAL),
-                    Club(name = "Film Society", description = "A club for cinema enthusiasts ...", category = Club.ClubCategory.CULTURAL)
+                    Club(
+                        name = "Chess Club",
+                        description = "A community for players ...",
+                        category = Club.ClubCategory.SPORTS
+                    ),
+                    Club(
+                        name = "Robotics Club",
+                        description = "The Robotics Club is the place ...",
+                        category = Club.ClubCategory.TECHNOLOGY
+                    ),
+                    Club(
+                        name = "Photography Club",
+                        description = "A space for photography enthusiasts ...",
+                        category = Club.ClubCategory.SOCIAL
+                    ),
+                    Club(
+                        name = "Hiking & Outdoors Club",
+                        description = "Focused on outdoor activities ...",
+                        category = Club.ClubCategory.SOCIAL
+                    ),
+                    Club(
+                        name = "Film Society",
+                        description = "A club for cinema enthusiasts ...",
+                        category = Club.ClubCategory.CULTURAL
+                    )
                 )
             )
         } else {
@@ -51,12 +75,60 @@ class DataInitializer(
         if (eventRepository.count() == 0L && clubs.size >= 5) {
 
             val events = listOf(
-                Event(clubId = clubs[0].id, owner = alice, name = "Beginner's Chess Workshop", date = LocalDate.now().plusDays(7), location = "Room A101", type = Event.EventType.WORKSHOP, description = "Introduction to chess basics"),
-                Event(clubId = clubs[0].id, owner = alice, name = "Spring Chess Tournament", date = LocalDate.now().plusDays(13), location = "Main Hall", type = Event.EventType.COMPETITION, description = "University open spring chess tournament"),
-                Event(clubId = clubs[1].id, owner = alice, name = "Robotics Workshop", date = LocalDate.now().plusDays(10), location = "Lab 1", type = Event.EventType.WORKSHOP, description = "Build a robot"),
-                Event(clubId = clubs[2].id, owner = alice, name = "Photo Walk", date = LocalDate.now().plusDays(3), location = "City Center", type = Event.EventType.SOCIAL, description = "Outdoor photography"),
-                Event(clubId = clubs[3].id, owner = alice, name = "Mountain Hike", date = LocalDate.now().plusDays(7), location = "Sintra", type = Event.EventType.SOCIAL, description = "Day hike"),
-                Event(clubId = clubs[4].id, owner = alice, name = "Film Screening", date = LocalDate.now().plusDays(2), location = "Auditorium", type = Event.EventType.MEETING, description = "Classic movie night")
+                Event(
+                    clubId = clubs[0].id,
+                    owner = alice,
+                    name = "Beginner's Chess Workshop",
+                    date = LocalDate.now().plusDays(7),
+                    location = "Room A101",
+                    type = Event.EventType.WORKSHOP,
+                    description = "Introduction to chess basics"
+                ),
+                Event(
+                    clubId = clubs[0].id,
+                    owner = bob,
+                    name = "Spring Chess Tournament",
+                    date = LocalDate.now().plusDays(13),
+                    location = "Main Hall",
+                    type = Event.EventType.COMPETITION,
+                    description = "University open spring chess tournament"
+                ),
+                Event(
+                    clubId = clubs[1].id,
+                    owner = charlie,
+                    name = "Robotics Workshop",
+                    date = LocalDate.now().plusDays(10),
+                    location = "Lab 1",
+                    type = Event.EventType.WORKSHOP,
+                    description = "Build a robot"
+                ),
+                Event(
+                    clubId = clubs[2].id,
+                    owner = alice,
+                    name = "Photo Walk",
+                    date = LocalDate.now().plusDays(3),
+                    location = "City Center",
+                    type = Event.EventType.SOCIAL,
+                    description = "Outdoor photography"
+                ),
+                Event(
+                    clubId = clubs[3].id,
+                    owner = bob,
+                    name = "Mountain Hike",
+                    date = LocalDate.now().plusDays(7),
+                    location = "Sintra",
+                    type = Event.EventType.SOCIAL,
+                    description = "Day hike"
+                ),
+                Event(
+                    clubId = clubs[4].id,
+                    owner = charlie,
+                    name = "Film Screening",
+                    date = LocalDate.now().plusDays(2),
+                    location = "Auditorium",
+                    type = Event.EventType.MEETING,
+                    description = "Classic movie night"
+                )
             )
             eventRepository.saveAll(events)
         }

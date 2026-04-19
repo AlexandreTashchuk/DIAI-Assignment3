@@ -70,12 +70,9 @@ Hibernate then tried to add a foreign key `event.owner_id -> app_users.id`, whic
 
 ### Fix Applied
 
-- Added `schema.sql` repair step to convert `owner_id = 0` to `NULL` before JPA migration.
-- Enabled SQL init on startup in `application.properties`:
-  - `spring.sql.init.mode=always`
-  - `spring.sql.init.continue-on-error=true`
 - Kept `Event.owner` join column nullable during migration.
-- Added startup backfill in `DataInitializer` to assign missing owners to `alice`.
+- Added startup backfill in `DataInitializer` (`backfillMissingOwners`) to repair legacy rows.
+- Seeded startup events with real owners distributed across `alice`, `bob`, and `charlie`.
 
 This prevents FK creation failures on upgraded databases while keeping new events owned correctly.
 
