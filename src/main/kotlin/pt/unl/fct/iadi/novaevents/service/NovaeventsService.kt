@@ -15,8 +15,13 @@ import java.time.LocalDate
 class NovaeventsService(
     private val appUserRepository: AppUserRepository,
     private val clubRepository: ClubRepository,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val weatherService: WeatherService
 ) {
+
+    companion object {
+        private const val HIKING_OUTDOORS_CLUB_NAME = "Hiking & Outdoors Club"
+    }
 
     fun listAllClubs(): List<Club> =
         clubRepository.findAll()
@@ -59,7 +64,20 @@ class NovaeventsService(
     @PreAuthorize("hasAnyRole('EDITOR','ADMIN')")
     fun createEvent(clubId: Long, form: EventForm): Event {
 
-        getClubById(clubId)
+        val club = getClubById(clubId)
+
+        val normalizedLocation = form.location?.trim().orEmpty()
+        if (isHikingOutdoorsClub(club)) {
+            if (normalizedLocation.isBlank()) {
+                throw OutdoorEventLocationRequiredException("Location is required for outdoor events")
+            }
+
+            if (weatherService.isRaining(normalizedLocation) == true) {
+                throw OutdoorEventBadWeatherException(
+                    "It is currently raining at \"$normalizedLocation\" — outdoor events cannot be created in bad weather"
+                )
+            }
+        }
 
         if (eventRepository.existsByNameIgnoreCase(form.name!!)) {
             throw EventAlreadyExistsException("Event '${form.name}' already exists")
@@ -70,7 +88,7 @@ class NovaeventsService(
             owner = currentUser(),
             name = form.name,
             date = form.date!!,
-            location = form.location ?: "",
+            location = normalizedLocation,
             type = form.type!!,
             description = form.description ?: ""
         )
@@ -135,4 +153,7 @@ class NovaeventsService(
     private fun currentUser() =
         appUserRepository.findByUsername(SecurityContextHolder.getContext().authentication.name)
             ?: throw IllegalStateException("Authenticated user does not exist in database")
+
+    private fun isHikingOutdoorsClub(club: Club): Boolean =
+        club.name == HIKING_OUTDOORS_CLUB_NAME
 }

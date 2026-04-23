@@ -47,6 +47,16 @@ docker compose up -d mysql
 
 App default URL: `http://localhost:8080`
 
+## Weather API Setup
+
+Set your OpenWeatherMap key in `src/main/resources/application.properties`:
+
+```properties
+weather.api.key=<your-key>
+```
+
+This key is used only server-side for weather checks during Hiking & Outdoors event creation.
+
 ## Default Seeded Users
 
 - `alice` / `password123` -> `ROLE_EDITOR`

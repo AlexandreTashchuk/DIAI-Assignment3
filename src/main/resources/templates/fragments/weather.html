@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<span th:fragment="result" th:switch="${raining}">
+    <span th:case="true" class="badge bg-warning text-dark">Raining</span>
+    <span th:case="false" class="badge bg-success">Clear</span>
+    <span th:case="*" class="text-secondary">Weather data unavailable.</span>
+</span>
+</body>
+</html>
+

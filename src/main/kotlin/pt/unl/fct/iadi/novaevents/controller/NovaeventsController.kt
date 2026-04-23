@@ -8,6 +8,8 @@ import pt.unl.fct.iadi.novaevents.model.Event
 import pt.unl.fct.iadi.novaevents.repository.EventRepository
 import pt.unl.fct.iadi.novaevents.service.EventAlreadyExistsException
 import pt.unl.fct.iadi.novaevents.service.NovaeventsService
+import pt.unl.fct.iadi.novaevents.service.OutdoorEventBadWeatherException
+import pt.unl.fct.iadi.novaevents.service.OutdoorEventLocationRequiredException
 import java.time.LocalDate
 
 @Controller
@@ -115,6 +117,20 @@ class NovaeventsController(val service: NovaeventsService, val eventRepository: 
 
             // bindingResult.rejectValue("name", "error.name", ex.message ?: "Duplicate event")
             bindingResult.rejectValue("name", "error.name", "An event with this name already exists")
+
+            model.addAttribute("types", Event.EventType.values())
+            model.addAttribute("clubId", clubId)
+
+            "events/create"
+        } catch (ex: OutdoorEventLocationRequiredException) {
+            bindingResult.rejectValue("location", "error.location", ex.message ?: "Location is required")
+
+            model.addAttribute("types", Event.EventType.values())
+            model.addAttribute("clubId", clubId)
+
+            "events/create"
+        } catch (ex: OutdoorEventBadWeatherException) {
+            bindingResult.rejectValue("location", "error.location", ex.message ?: "Weather check failed")
 
             model.addAttribute("types", Event.EventType.values())
             model.addAttribute("clubId", clubId)

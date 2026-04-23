@@ -3,20 +3,24 @@ package pt.unl.fct.iadi.novaevents.security
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
+import org.springframework.http.MediaType
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.savedrequest.CookieRequestCache
-import org.springframework.security.web.context.NullSecurityContextRepository
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
-import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
@@ -38,16 +42,60 @@ class SecurityConfig(
     }
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = listOf("http://localhost:8080", "http://127.0.0.1:8080")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        configuration.allowedHeaders = listOf("*")
+        configuration.allowCredentials = true
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/api/**", configuration)
+        return source
+    }
+
+    @Bean
+    @Order(1)
+    fun apiSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .securityMatcher("/api/**")
+            .cors { }
+            .csrf { csrf -> csrf.disable() }
+            .sessionManagement { session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            }
+            .authenticationProvider(authenticationProvider(passwordEncoder()))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .authorizeHttpRequests { auth ->
+                auth.anyRequest().authenticated()
+            }
+            .exceptionHandling { ex ->
+                ex.authenticationEntryPoint { _, response, _ ->
+                    response.status = HttpServletResponse.SC_UNAUTHORIZED
+                    response.contentType = MediaType.APPLICATION_JSON_VALUE
+                    response.writer.write("{\"error\":\"Unauthorized\"}")
+                }
+                ex.accessDeniedHandler { _, response, _ ->
+                    response.status = HttpServletResponse.SC_FORBIDDEN
+                    response.contentType = MediaType.APPLICATION_JSON_VALUE
+                    response.writer.write("{\"error\":\"Forbidden\"}")
+                }
+            }
+            .formLogin { form -> form.disable() }
+            .logout { logout -> logout.disable() }
+
+        return http.build()
+    }
+
+    @Bean
+    @Order(2)
+    fun webSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { csrf ->
                 csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             }
             .sessionManagement { session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            }
-            .securityContext { context ->
-                context.securityContextRepository(NullSecurityContextRepository())
+                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             }
             .requestCache { cache -> cache.requestCache(CookieRequestCache()) }
             .authenticationProvider(authenticationProvider(passwordEncoder()))
